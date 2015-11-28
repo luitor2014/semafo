@@ -12,7 +12,7 @@ var PORT = process.env.PORT || 3000;
 var io = require('socket.io').listen(PORT);
 //socket.io - fin
 var client = new net.Socket();
-client.connect(25883, 'localhost', function() {
+client.connect(51823, 'localhost', function() {
 	console.log('Connected');
 	client.write('Hello, server! Love, Client.');
 });
