@@ -1,7 +1,8 @@
 
 var net = require('net');
 //socket.io
-
+var PORT = process.env.PORT || 3000;
+var io = require('socket.io').listen(PORT);
 //socket.io - fin
 var client = new net.Socket();
 client.connect(29545, 'localhost', function() {
