@@ -1,46 +1,46 @@
-// Load the TCP Library
-net = require('net');
+var readline = require('readline');
+var rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+  terminal: false
+});
 
-// Keep track of the chat clients
-var clients = [];
-var PORT = process.env.PORT || 8080;
-// Start a TCP Server
-net.createServer(function (socket) {
+var net = require('net');
+//socket.io
 
-  // Identify this client
-  socket.name = socket.remoteAddress + ":" + socket.remotePort 
+var PORT = 3000;
+var io = require('socket.io').listen(PORT);
+//socket.io - fin
+var client = new net.Socket();
+client.connect(3256, 'localhost', function() {
+	console.log('Connected');
+	client.write('Hello, server! Love, Client.');
+});
 
-  // Put this new client in the list
-  clients.push(socket);
+client.on('data', function(data) {
+	console.log('Received: ' + data);
+	io.sockets.emit("message_res", data.toString());
+	//client.destroy(); // kill client after server's response
+});
 
-  // Send a nice welcome message and announce
-  socket.write("Welcome " + socket.name + "\n");
-  broadcast(socket.name + " joined the chat\n", socket);
-  
-  // Handle incoming messages from clients.
-  socket.on('data', function (data) {
-    broadcast(socket.name + "> " + data, socket);
-     socket.write("Soy: " + "NODEJS!!!"+ "\n");
-  });
+client.on('close', function() {
+	console.log('Connection closed');
+});
+//socket.io
 
-  // Remove the client from the list when it leaves
-  socket.on('end', function () {
-    clients.splice(clients.indexOf(socket), 1);
-    broadcast(socket.name + " left the chat.\n");
-  });
-  
-  // Send a message to all clients
-  function broadcast(message, sender) {
-    clients.forEach(function (client) {
-      // Don't want to send it to sender
-      if (client === sender) return;
-      client.write(message);
+io.on('connection',function(socket){
+	console.log("Conectado socket.io");
+	//io.sockets.emit("message_res", "Hola desde el servidor TCP");
+	//socket.emit("message_res", "Hola desde el servidor TCP");
+	//socket.broadcast.emit("message_res", "Hola desde el servidor TCP");
+	socket.on('message_req', function(dt){
+		client.write(dt);
+		//socket.emit("message_res", "Hola desde el servidor TCP");
+        //socket.broadcast.emit("message_res", "Hola desde el servidor TCP");
     });
-    // Log it to the server output too
-    process.stdout.write(message);
-  }
+});
+rl.on('line', function(dt){
+	client.write(dt.toString());
+});
 
-}).listen(PORT);
-
-// Put a friendly message on the terminal of the server.
-console.log("Chat server running at port "+PORT+"\n");
+console.log("Client TCP...");
