@@ -8,11 +8,11 @@ var rl = readline.createInterface({
 var net = require('net');
 //socket.io
 
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 var io = require('socket.io').listen(PORT);
 //socket.io - fin
 var client = new net.Socket();
-client.connect(3256, 'localhost', function() {
+client.connect(37571, 'localhost', function() {
 	console.log('Connected');
 	client.write('Hello, server! Love, Client.');
 });
@@ -42,5 +42,9 @@ io.on('connection',function(socket){
 rl.on('line', function(dt){
 	client.write(dt.toString());
 });
+setInterval(function(){
+  client.write(dt.toString());
+  console.log("Escuchando..."+PORT );
+},5000);
 
 console.log("Client TCP...");
