@@ -1,26 +1,31 @@
-
 var net = require('net');
-//socket.io
-var PORT = process.env.PORT || 3000;
-var io = require('socket.io').listen(PORT);
-//socket.io - fin
-var client = new net.Socket();
-client.connect(29545, 'tcpserver123.herokuapp.com', function() {
-	console.log('Connected');
-	client.write('Hello, server! Love, Client.');
-});
+url  = require("url");
+proxy = url.parse(process.env.PROXIMO_URL)
+//var sys = require('sys');
+var count = 0;
+var port = process.env.PORT || 1337;
+var host = '54.235.132.133'; // heroku-app-name when deployed
+var server_host = "tcpserver123.herokuapp.com"; 
+var server = net.createServer(function (socket) { 
 
-client.on('data', function(data) {
-	console.log('Received: ' + data);
-});
+  // sys.puts("Connection from " + socket.remoteAddress);
+   socket.write("Hello Dude!\n");
+   socket.addListener("data", function (data) {
+          // do stuff with (data) from client here 
+          console.log(data.toString());
+     });
+     
+     socket.on('close', function (error) {
+        console.log('Error: ' + error);
+        count--;
+    });
+   });
 
-client.on('close', function() {
-	console.log('Connection closed');
-});
+server.listen(port);
+
+    console.log('server listening on: ' + port +' host: '+host);
+
 
 setInterval(function(){
-  //client.write(dt.toString());
-  console.log("Escuchando...ConectadoCLientTcp" );
-},5000);
-
-console.log("Client TCP...");
+  console.log("Escuchando..."+port );
+},4000);
